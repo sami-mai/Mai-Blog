@@ -59,12 +59,13 @@ class BlogPost(db.Model):
     __tablename__ = 'blogPosts'
 
     id = db.Column(db.Integer, primary_key=True)
-    blogPost_category = db.Column(db.String)
     blogPost_title = db.Column(db.String)
     blogPost_description = db.Column(db.String)
     blogPost_body = db.Column(db.String)
     posted_on = db.Column(db.DateTime, default=datetime.utcnow)
+    comments = db.relationship('Comment', backref='role', lazy="dynamic")
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
 
     def save_blogPost(self):
         db.session.add(self)
@@ -78,3 +79,39 @@ class BlogPost(db.Model):
     def get_blogPosts(cls, id):
         blogPosts = BlogPost.query.filter_by(blogPost_id=id).all()
         return blogPosts
+
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    blogPost = db.relationship('BlogPost', backref='role', lazy="dynamic")
+
+    def __repr__(self):
+        return f'User {self.name}'
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    comment_body = db.Column(db.String)
+    posted_on = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    blogPost_id = db.Column(db.Integer, db.ForeignKey('blogPosts.id'))
+
+    def save_comment(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def clear_comments(cls):
+        Comment.all_comments.clear()
+
+    @classmethod
+    def get_comments(cls, id):
+        comments = Comment.query.filter_by(comment_id=id).all()
+        return comments
+
+
+    def __repr__(self):
+        return f'User {self.comment_body}'
