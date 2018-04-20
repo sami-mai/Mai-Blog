@@ -8,7 +8,9 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, index=True)
     uname = db.Column(db.String(255))
     password = password_hash = db.Column(db.String(255))
-    category = db.relationship('Category', backref='user', lazy="dynamic")
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    comment = db.relationship('Comment', backref='user', lazy="dynamic")
+    post = db.relationship('Post', backref='user_admin', lazy="dynamic")
 
     @property
     def password(self):
@@ -27,3 +29,25 @@ class User(db.Model):
 
     def __repr__(self):
         return f'User {self.username}'
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    users = db.relationship('User', backref='role', lazy="dynamic")
+
+
+    def __repr__(self):
+        return f'User {self.name}'
+
+
+class Subscriber(db.Model):
+    __tablename__ = 'subscribers'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    email = db.Column(db.String(255), unique=True, index=True)
+
+
+    def __repr__(self):
+        return f'User {self.name}'
