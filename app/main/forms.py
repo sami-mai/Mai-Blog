@@ -17,7 +17,7 @@ class UpdateProfile(FlaskForm):
     submit = SubmitField('Update')
 
 
-class SubcriptionForm(FlaskForm):
+class SubscriptionForm(FlaskForm):
 
     name = StringField('Pitch genre', validators=[Required()])
     title = StringField('Pitch title', validators=[Required()])
