@@ -10,6 +10,14 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class PhotoProfile(db.Model):
+    __tablename__ = 'profile_photos'
+
+    id = db.Column(db.Integer, primary_key=True)
+    pic_path = db.Column(db.String())
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +25,10 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True, index=True)
     uname = db.Column(db.String(255))
     password_hash = db.Column(db.String(255))
+    bio = db.Column(db.String(255))
+    profile_pic_path = db.Column(db.String())
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    photos = db.relationship('PhotoProfile', backref='user', lazy="dynamic")
     comment = db.relationship('Comment', backref='user', lazy="dynamic")
     blogPost = db.relationship('BlogPost', backref='user_admin', lazy="dynamic")
 
@@ -80,6 +91,10 @@ class BlogPost(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete_blogPost(self):
+        db.session.delete(self)
+        db.session.commit()
+
     @classmethod
     def clear_blogPosts(cls):
         BlogPost.all_blogPosts.clear()
@@ -110,6 +125,10 @@ class Comment(db.Model):
 
     def save_comment(self):
         db.session.add(self)
+        db.session.commit()
+
+    def delete_comment(self):
+        db.session.delete(self)
         db.session.commit()
 
     @classmethod
