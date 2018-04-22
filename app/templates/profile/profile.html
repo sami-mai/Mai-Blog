@@ -1,0 +1,67 @@
+{% extends 'base.html'%} {% block content %}
+<div class="container">
+  <div class="row">
+    <!-- displaying  Username-->
+    <div class="col-md-4">
+      <h3> {{user.username|capitalize}} </h3>
+
+      <!--Displaying user bio-->
+      {% if user.bio %}
+      <p> {{user.bio}}</p>
+      {%else%}
+      <p> {{user.username|capitalize}} has no bio </p>
+      {% endif %}
+    </div>
+
+    <!--Display profile photo-->
+    <div class="col-md-4">
+
+      {% if user.profile_pic_path %}
+      <img src="{{url_for('static',filename=user.profile_pic_path)}}" alt="" class="img-thumbnail"> {%else%}
+      <p>No profile picture</p>
+      {% endif %} {% if user == current_user %}
+      <form action="{{url_for('main.update_pic',uname=user.username)}}" method="post" enctype="multipart/form-data">
+
+        <input type="file" name="photo" class="form-control" required>
+        <input type="submit"> {% endif %}
+
+    </div>
+
+    {% if user == current_user %}
+    <a href="{{url_for('main.update_profile',uname=user.username)}}">Edit profile</a> {% endif %}
+
+  </div>
+</div>
+
+<div class="container jumbotron">
+  <h1>{{user.username|capitalize}} <small> Welcome {{session.username}}</small></h1>
+  <a class="btn btn-success" href="{{url_for('main.add_blogPost', uname=user.username)}}"> Add Blog Post</a>
+  <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Brief description</th>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+    </tr>
+    {% for pitch in pitches %}
+    <tr>
+      <td>{{blogPost.id}}</td>
+      <td>{{blogPost.blogPost_title}}</td>
+      <td>{{blogPost.blogPost_description}}</td>
+      <td>{{blogPost.posted_on}}</td>
+      <td><a href="edit_blogPost/{{blogPost.id}}" class="btn btn-default pull-right">Edit</a></td>
+      <td>
+        <form action="{{url_for('delete_blogPost', id=blogPost.id)}}" method="post">
+          <input type="hidden" name="_method" value="DELETE">
+          <input type="submit" value="Delete" class="btn btn-danger">
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+</div>
+{% endblock %}
